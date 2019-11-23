@@ -1,21 +1,19 @@
 package br.edu.utfpr.tsi.sd.core.model;
 
-import br.edu.utfpr.tsi.sd.core.controller.RemoteControl;
+import br.edu.utfpr.tsi.sd.core.controller.RemoteControls;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.UUID;
 
 public class RemotePlayer extends Player {
+    private final RemoteControls remoteControls;
 
-    private final RemoteControl remoteControl;
-
-    public RemotePlayer(RemoteControl remoteControl, Color color, UUID id) {
-        super(remoteControl, color, id);
-        this.remoteControl = remoteControl;
+    public RemotePlayer(UUID id, RemoteControls remoteControls, Color color) {
+        super(id, remoteControls, color);
+        this.remoteControls = remoteControls;
     }
-
-    public RemoteControl getRemoteControls() {
-        return remoteControl;
+    public RemoteControls getRemoteControls() {
+        return remoteControls;
     }
-
 }
+

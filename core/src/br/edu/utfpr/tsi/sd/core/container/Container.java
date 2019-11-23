@@ -8,12 +8,13 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public interface Container<T extends Identifiable> {
+    List<T> getAll();
 
     void add(T toAdd);
 
-    List<T> getAll();
+    void update();
 
-    void update(float delta);
+    void move(float delta);
 
     default Stream<T> stream() {
         return getAll().stream();
@@ -36,5 +37,4 @@ public interface Container<T extends Identifiable> {
     default void removeById(String id) {
         removeById(UUID.fromString(id));
     }
-
 }

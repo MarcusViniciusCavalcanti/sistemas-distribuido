@@ -5,13 +5,15 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 
-import java.io.Serializable;
-
-public interface Visible extends Serializable {
+public interface Visible {
 
     Color getColor();
 
     Polygon getShape();
+
+    default boolean collidesWith(Visible anotherVisible) {
+        return Intersector.overlapConvexPolygons(getShape(), anotherVisible.getShape());
+    }
 
     default Vector2 getPosition() {
         return new Vector2(getShape().getX(), getShape().getY());
@@ -27,9 +29,5 @@ public interface Visible extends Serializable {
 
     default void setRotation(float degrees) {
         getShape().setRotation(degrees);
-    }
-
-    default boolean collidesWith(Visible anotherVisible) {
-        return Intersector.overlapConvexPolygons(getShape(), anotherVisible.getShape());
     }
 }

@@ -40,7 +40,7 @@ project(":desktop") {
     apply plugin: "java-library"
 
     dependencies {
-        implementation project(":core")
+        implementation project(":client")
 
         api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
@@ -55,6 +55,8 @@ project(":core") {
         implementation group: 'org.openjfx', name: 'javafx', version: '11', ext: 'pom'
 
         implementation "com.fasterxml.jackson.core:jackson-databind:2.8.4"
+        implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.8.4'
+
         implementation "org.slf4j:slf4j-simple:1.7.25"
 
         compileOnly "org.projectlombok:lombok:$lombokVersion"
@@ -82,9 +84,12 @@ project(":client") {
 
 
     dependencies {
-        compile project(":core")
-        compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-        compile "io.socket:socket.io-client:0.8.2"
+        implementation project(":core")
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        implementation "io.socket:socket.io-client:0.8.2"
+
+        compileOnly "org.projectlombok:lombok:$lombokVersion"
+        annotationProcessor "org.projectlombok:lombok:$lombokVersion"
     }
 }
 

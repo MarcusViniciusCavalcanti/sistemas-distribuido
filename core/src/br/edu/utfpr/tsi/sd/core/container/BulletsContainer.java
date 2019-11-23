@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class BulletsContainer implements Container<Bullet> {
-
     private final List<Bullet> bullets;
 
     public BulletsContainer(List<Bullet> bullets) {
@@ -23,18 +22,22 @@ public class BulletsContainer implements Container<Bullet> {
         bullets.add(bullet);
     }
 
+    public void removeByPlayerId(UUID id) {
+        bullets.removeIf(bullet -> bullet.getShooterId().equals(id));
+    }
+
     @Override
     public List<Bullet> getAll() {
         return bullets;
     }
 
     @Override
-    public void update(float delta) {
-        bullets.forEach(bullet -> bullet.move(delta));
-        bullets.removeIf(bullet -> !bullet.isInRange());
+    public void update() {
+        bullets.removeIf(bullet -> !bullet.isInRange() || bullet.hasHitSomething());
     }
 
-    public void removeByPlayerId(UUID id) {
-        bullets.removeIf(bullet -> bullet.getShooterId().equals(id));
+    @Override
+    public void move(float delta) {
+        bullets.forEach(bullet -> bullet.move(delta));
     }
 }
