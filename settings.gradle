@@ -1,4 +1,2 @@
-include 'desktop', 'core'
-include 'AsteroidGame'
-include 'asteroids'
+include 'desktop', 'core', 'server', 'client'
 
