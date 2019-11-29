@@ -7,6 +7,10 @@ import br.edu.utfpr.tsi.sd.core.container.Container;
 import br.edu.utfpr.tsi.sd.core.container.PlayersContainer;
 import br.edu.utfpr.tsi.sd.core.controller.Controls;
 import br.edu.utfpr.tsi.sd.core.controller.NoopControls;
+import br.edu.utfpr.tsi.sd.core.model.Arena;
+import br.edu.utfpr.tsi.sd.core.model.Bullet;
+import br.edu.utfpr.tsi.sd.core.model.Player;
+import br.edu.utfpr.tsi.sd.core.tools.Randomize;
 import br.edu.utfpr.tsi.sd.core.web.impl.BulletDto;
 import br.edu.utfpr.tsi.sd.core.web.impl.GameStateDto;
 import br.edu.utfpr.tsi.sd.core.web.impl.PlayerDto;
@@ -14,23 +18,17 @@ import br.edu.utfpr.tsi.sd.core.web.mapper.BulletMapper;
 import br.edu.utfpr.tsi.sd.core.web.mapper.ControlsMapper;
 import br.edu.utfpr.tsi.sd.core.web.mapper.GameStateMapper;
 import br.edu.utfpr.tsi.sd.core.web.mapper.PlayerMapper;
-import br.edu.utfpr.tsi.sd.core.model.Arena;
-import br.edu.utfpr.tsi.sd.core.model.Bullet;
-import br.edu.utfpr.tsi.sd.core.model.Player;
-import br.edu.utfpr.tsi.sd.core.tools.Randomize;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import lombok.Builder;
 
 import java.util.List;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
-@Builder
 public class AsteroidsClientScreen extends ScreenAdapter {
     private final Controls localControls;
     private final Client client;
@@ -62,6 +60,10 @@ public class AsteroidsClientScreen extends ScreenAdapter {
         this.arena = arena;
     }
 
+    public static AsteroidsClientScreenBuilder builder() {
+        return new AsteroidsClientScreenBuilder();
+    }
+
     @Override
     public void show() {
         client.onConnected(introductoryStateDto -> {
@@ -88,13 +90,13 @@ public class AsteroidsClientScreen extends ScreenAdapter {
 
         client.onGameStateReceived(gameStateDto -> {
             gameStateDto.getBullets().forEach(bulletDto -> {
-                        Optional<Bullet> bullet = bulletsContainer.getById(bulletDto.getId());
-                        if(bullet.isEmpty()) {
-                            bulletsContainer.add(BulletMapper.fromDto(bulletDto, playersContainer));
-                        } else {
-                            BulletMapper.updateByDto(bullet.get(), bulletDto);
-                        }
-                    });
+                Optional<Bullet> bullet = bulletsContainer.getById(bulletDto.getId());
+                if (bullet.isEmpty()) {
+                    bulletsContainer.add(BulletMapper.fromDto(bulletDto, playersContainer));
+                } else {
+                    BulletMapper.updateByDto(bullet.get(), bulletDto);
+                }
+            });
 
             List<String> existingBulletIds = gameStateDto.getBullets().stream()
                     .map(BulletDto::getId)
@@ -110,8 +112,8 @@ public class AsteroidsClientScreen extends ScreenAdapter {
 
         localStateSynchronizer.updateAccordingToGameState(gameStateDto -> {
             gameStateDto.getPlayers().forEach(playerDto -> playersContainer
-                            .getById(playerDto.getId())
-                            .ifPresent(player -> PlayerMapper.updateByDto(player, playerDto)));
+                    .getById(playerDto.getId())
+                    .ifPresent(player -> PlayerMapper.updateByDto(player, playerDto)));
         });
 
         localStateSynchronizer.supplyGameState(() -> GameStateMapper.fromState(playersContainer, bulletsContainer));
@@ -126,7 +128,7 @@ public class AsteroidsClientScreen extends ScreenAdapter {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if(!client.isConnected()) return;
+        if (!client.isConnected()) return;
         client.lockEventListeners();
 
         client.sendControls(ControlsMapper.mapToDto(localControls));
@@ -155,5 +157,85 @@ public class AsteroidsClientScreen extends ScreenAdapter {
     private void runGameLogic(float delta) {
         playersContainer.streamShips().forEach(arena::ensurePlacementWithinBounds);
         playersContainer.move(delta);
+    }
+
+    public static class AsteroidsClientScreenBuilder {
+        private Controls localControls;
+        private Client client;
+        private LocalStateSynchronizer localStateSynchronizer;
+        private Viewport viewport;
+        private ShapeRenderer shapeRenderer;
+        private PlayersContainer<Player> playersContainer;
+        private Container<Bullet> bulletsContainer;
+        private ContainerRenderer<Player> playersRenderer;
+        private ContainerRenderer<Bullet> bulletsRenderer;
+        private Arena arena;
+
+        AsteroidsClientScreenBuilder() {
+        }
+
+        public AsteroidsClientScreenBuilder localControls(Controls localControls) {
+            this.localControls = localControls;
+            return this;
+        }
+
+        public AsteroidsClientScreenBuilder client(Client client) {
+            this.client = client;
+            return this;
+        }
+
+        public AsteroidsClientScreenBuilder localStateSynchronizer(LocalStateSynchronizer localStateSynchronizer) {
+            this.localStateSynchronizer = localStateSynchronizer;
+            return this;
+        }
+
+        public AsteroidsClientScreenBuilder viewport(Viewport viewport) {
+            this.viewport = viewport;
+            return this;
+        }
+
+        public AsteroidsClientScreenBuilder shapeRenderer(ShapeRenderer shapeRenderer) {
+            this.shapeRenderer = shapeRenderer;
+            return this;
+        }
+
+        public AsteroidsClientScreenBuilder playersContainer(PlayersContainer<Player> playersContainer) {
+            this.playersContainer = playersContainer;
+            return this;
+        }
+
+        public AsteroidsClientScreenBuilder bulletsContainer(Container<Bullet> bulletsContainer) {
+            this.bulletsContainer = bulletsContainer;
+            return this;
+        }
+
+        public AsteroidsClientScreenBuilder playersRenderer(ContainerRenderer<Player> playersRenderer) {
+            this.playersRenderer = playersRenderer;
+            return this;
+        }
+
+        public AsteroidsClientScreenBuilder bulletsRenderer(ContainerRenderer<Bullet> bulletsRenderer) {
+            this.bulletsRenderer = bulletsRenderer;
+            return this;
+        }
+
+        public AsteroidsClientScreenBuilder arena(Arena arena) {
+            this.arena = arena;
+            return this;
+        }
+
+        public AsteroidsClientScreen build() {
+            return new AsteroidsClientScreen(localControls,
+                    client,
+                    localStateSynchronizer,
+                    viewport,
+                    shapeRenderer,
+                    playersContainer,
+                    bulletsContainer,
+                    playersRenderer,
+                    bulletsRenderer,
+                    arena
+            );
+        }
     }
 }

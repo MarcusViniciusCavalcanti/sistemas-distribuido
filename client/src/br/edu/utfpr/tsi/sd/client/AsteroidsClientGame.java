@@ -8,6 +8,7 @@ import br.edu.utfpr.tsi.sd.client.view.PlayerRenderer;
 import br.edu.utfpr.tsi.sd.client.view.VisibleRenderer;
 import br.edu.utfpr.tsi.sd.core.container.BulletsContainer;
 import br.edu.utfpr.tsi.sd.core.container.PlayersContainer;
+import br.edu.utfpr.tsi.sd.core.model.Arena;
 import br.edu.utfpr.tsi.sd.core.tools.Delay;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
@@ -51,6 +52,7 @@ public class AsteroidsClientGame extends Game {
                 .shapeRenderer(shapeRenderer)
                 .localControls(localControls)
                 .viewport(viewport)
+                .arena(new Arena(WORLD_WIDTH, WORLD_HEIGHT))
                 .build();
 
         setScreen(asteroids);
